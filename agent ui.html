@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="si" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SG AI Agent | Smart Developer Assistant</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brandDark: '#0b0f19',
+                        brandCard: '#131825',
+                        brandBorder: '#1f293d',
+                        brandAccent: '#3b82f6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-brandDark text-slate-100 flex flex-col font-sans antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="h-16 bg-brandCard/90 backdrop-blur-md border-b border-brandBorder px-6 flex items-center justify-between z-10">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/20 font-bold text-white text-sm tracking-wider">
+                SG
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-semibold text-sm tracking-tight text-white">SG AI Agent</span>
+                    <span class="px-2 py-0.5 text-[10px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full">v2.1 Pro</span>
+                </div>
+                <p class="text-[11px] text-slate-400 font-medium">Ready to assist your workflow</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <button onclick="clearChat()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-lg transition text-sm" title="Clear Conversation">
+                <i class="fa-regular fa-trash-can"></i>
+            </button>
+            <div class="w-px h-4 bg-brandBorder mx-1"></div>
+            <div class="flex items-center gap-2 px-3 py-1.5 bg-brandDark border border-brandBorder rounded-full">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs text-slate-300 font-medium">System Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Chat Workspace -->
+    <main id="chat-container" class="flex-1 overflow-y-auto px-4 py-6 space-y-6 max-w-3xl w-full mx-auto">
+        
+        <!-- Welcome Greeting Card -->
+        <div class="flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0 text-white font-semibold text-xs shadow">
+                SG
+            </div>
+            <div class="space-y-3 max-w-[85%]">
+                <div class="bg-brandCard border border-brandBorder p-4 rounded-2xl rounded-tl-sm text-sm text-slate-200 leading-relaxed shadow-sm">
+                    <p class="font-medium text-white mb-1">Hello! I am your SG AI Agent.</p>
+                    <p class="text-slate-300">How can I help you architect systems, write code, or manage your projects today?</p>
+                </div>
+
+                <!-- Quick Starter Prompt Chips -->
+                <div class="flex flex-wrap gap-2 pt-1">
+                    <button onclick="sendQuickPrompt('Write a clean Flutter API service method')" class="text-xs bg-brandCard hover:bg-slate-800 border border-brandBorder px-3 py-1.5 rounded-lg text-slate-300 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-code text-blue-400"></i> Write Flutter API Service
+                    </button>
+                    <button onclick="sendQuickPrompt('Debug my Node.js backend middleware')" class="text-xs bg-brandCard hover:bg-slate-800 border border-brandBorder px-3 py-1.5 rounded-lg text-slate-300 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-bug text-amber-400"></i> Debug Node.js Middleware
+                    </button>
+                    <button onclick="sendQuickPrompt('Optimize my SQL query for POS inventory')" class="text-xs bg-brandCard hover:bg-slate-800 border border-brandBorder px-3 py-1.5 rounded-lg text-slate-300 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-database text-emerald-400"></i> Optimize POS SQL Query
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Input Bar Area -->
+    <footer class="bg-brandCard/90 backdrop-blur-md border-t border-brandBorder p-4">
+        <div class="max-w-3xl mx-auto">
+            
+            <!-- Hidden File Input -->
+            <input type="file" id="file-input" class="hidden" onchange="handleFileSelect(event)">
+            
+            <!-- Attached File Preview Pill (Hidden by default) -->
+            <div id="file-preview" class="hidden mb-2.5 flex items-center justify-between bg-brandDark border border-blue-500/30 px-3 py-1.5 rounded-xl w-fit text-xs text-blue-300">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-file-lines text-blue-400"></i>
+                    <span id="file-name" class="font-medium truncate max-w-[200px]">document.txt</span>
+                </div>
+                <button onclick="removeFile()" class="ml-3 text-slate-400 hover:text-red-400 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Input Box & Actions Container -->
+            <div class="relative flex items-center bg-brandDark border border-brandBorder rounded-2xl focus-within:border-blue-500 transition shadow-inner">
+                
+                <!-- Attachment Button -->
+                <button onclick="document.getElementById('file-input').click()" class="pl-4 pr-2 text-slate-400 hover:text-white transition py-3" title="Attach file">
+                    <i class="fa-solid fa-paperclip text-sm"></i>
+                </button>
+
+                <!-- Text Input -->
+                <input type="text" id="user-input" placeholder="Ask SG AI Agent anything..." 
+                    class="w-full bg-transparent px-2 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none">
+
+                <!-- Send Button -->
+                <button id="send-btn" onclick="handleSend()" class="mx-2 bg-blue-600 hover:bg-blue-500 text-white w-9 h-9 rounded-xl flex items-center justify-center transition shadow-md shadow-blue-600/30 flex-shrink-0">
+                    <i class="fa-solid fa-arrow-up text-xs"></i>
+                </button>
+            </div>
+            
+            <div class="text-center mt-2">
+                <span class="text-[10px] text-slate-500 font-medium tracking-wide">SG AI Agent can make mistakes. Verify important code.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Logic Script -->
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        let attachedFile = null;
+
+        // Handle File Attachment Selection
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            attachedFile = file;
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-preview').classList.remove('hidden');
+        }
+
+        // Remove Attached File
+        function removeFile() {
+            attachedFile = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('file-preview').classList.add('hidden');
+        }
+
+        // Append Message Function
+        function appendMessage(sender, text, fileName = null) {
+            const isUser = sender === 'user';
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex items-start space-x-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+            
+            let fileAttachmentHTML = '';
+            if (fileName) {
+                fileAttachmentHTML = `
+                    <div class="mb-2 flex items-center space-x-2 bg-black/20 px-2.5 py-1 rounded-lg text-xs border border-white/10 w-fit">
+                        <i class="fa-solid fa-file-lines text-blue-300"></i>
+                        <span class="truncate max-w-[180px]">${fileName}</span>
+                    </div>
+                `;
+            }
+
+            messageDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-lg ${isUser ? 'bg-indigo-600' : 'bg-blue-600'} flex items-center justify-center flex-shrink-0 text-white font-semibold text-xs shadow">
+                    ${isUser ? 'YOU' : 'SG'}
+                </div>
+                <div class="${isUser ? 'bg-blue-600 text-white' : 'bg-brandCard border border-brandBorder text-slate-200'} p-4 rounded-2xl ${isUser ? 'rounded-tr-sm' : 'rounded-tl-sm'} max-w-[80%] text-sm leading-relaxed shadow-sm">
+                    ${fileAttachmentHTML}
+                    <div>${text}</div>
+                </div>
+            `;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Show Typing Indicator
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'flex items-start space-x-3';
+            typingDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0 text-white font-semibold text-xs shadow">SG</div>
+                <div class="bg-brandCard border border-brandBorder px-4 py-3 rounded-2xl rounded-tl-sm text-slate-400 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-blue-500 animate-bounce"></span>
+                    <span class="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:0.2s]"></span>
+                    <span class="w-2 h-2 rounded-full bg-blue-500 animate-bounce [animation-delay:0.4s]"></span>
+                </div>
+            `;
+            chatContainer.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) indicator.remove();
+        }
+
+        // Handle Message Send
+        function handleSend() {
+            const text = userInput.value.trim();
+            if (!text && !attachedFile) return;
+
+            const currentFileName = attachedFile ? attachedFile.name : null;
+
+            appendMessage('user', text || `Attached file: ${currentFileName}`, currentFileName);
+            
+            // Reset input and file
+            userInput.value = '';
+            removeFile();
+
+            // Simulate Agent Response
+            showTypingIndicator();
+            setTimeout(() => {
+                removeTypingIndicator();
+                appendMessage('ai', `I have reviewed your request. Everything looks solid. Let me know if you need any adjustments or full code integration for this task!`);
+            }, 1200);
+        }
+
+        function sendQuickPrompt(promptText) {
+            userInput.value = promptText;
+            handleSend();
+        }
+
+        function clearChat() {
+            chatContainer.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0 text-white font-semibold text-xs shadow">SG</div>
+                    <div class="bg-brandCard border border-brandBorder p-4 rounded-2xl rounded-tl-sm text-sm text-slate-200 leading-relaxed shadow-sm">
+                        Chat cleared. How can I help you next?
+                    </div>
+                </div>
+            `;
+        }
+
+        // Enter key listener
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+    </script>
+</body>
+</html>
